@@ -29,7 +29,7 @@ const mapStateToProps = ({ users })=> {
   };
 };
 
-const mapDispatchToProps = ( dispatch, { history })=> {
+const mapDispatchToProps = ( dispatch )=> {
   return {
     increment: (user)=> {
       user.rating++;
