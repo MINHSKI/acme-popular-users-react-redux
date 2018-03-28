@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-const Nav = ({ users })=> {
+const Nav = ({ users, mostPopularUser })=> {
   return (
     <ul>
       <li>
@@ -15,6 +15,15 @@ const Nav = ({ users })=> {
           Users ({ users.length })
         </Link>
       </li>
+      {
+        mostPopularUser && (
+          <li>
+            <Link to={`/users/${mostPopularUser.id}`}>
+              Most Popular: { mostPopularUser.name }
+            </Link>
+          </li>
+        )
+      }
       <li>
         <Link to='/users/create'>
           Create A User
@@ -25,8 +34,14 @@ const Nav = ({ users })=> {
 };
 
 const mapStateToProps = ({ users })=> {
+  const mostPopularUser = users.reduce((memo, user)=> {
+    if(typeof memo === 'undefined')
+      return user;
+    return user.rating > memo.rating ? user : memo;
+  }, undefined);
   return {
-    users
+    users,
+    mostPopularUser
   };
 };
 

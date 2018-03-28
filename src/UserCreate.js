@@ -7,7 +7,8 @@ class UserCreate extends Component{
   constructor(props){
     super(props);
     this.state = {
-      name: ''
+      name: '',
+      error: null
     };
     this.onChangeName = this.onChangeName.bind(this);
     this.onSave = this.onSave.bind(this);
@@ -15,18 +16,30 @@ class UserCreate extends Component{
   onSave(ev){
     ev.preventDefault();
     const user = { name: this.state.name };
-    this.props.saveUser(user);
+    this.props.saveUser(user)
+      .catch((err)=> {
+        this.setState({ error: err.response.data.name });
+      });
   }
   onChangeName(ev){
     this.setState({ name: ev.target.value });
   }
   render(){
-    const { name } = this.state;
+    const { name, error } = this.state;
     const { onChangeName, onSave } = this;
     return (
       <div>
         <h1>Create A User</h1>
         <form onSubmit={ onSave }>
+          {
+            error && (
+              <div style={{ color: 'red' }}>
+                {
+                  error
+                }
+              </div>
+            )
+          }
           <input value={ name } onChange={ onChangeName }/>
           <button>Create</button>
         </form>

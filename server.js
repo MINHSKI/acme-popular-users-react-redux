@@ -10,7 +10,9 @@ app.use(require('body-parser').json());
 
 
 app.get('/api/users', (req, res, next)=> {
-  User.findAll()
+  User.findAll({
+    order: [['rating', 'DESC']]
+  })
     .then( users => res.send(users))
     .catch(next);
 });
@@ -39,6 +41,10 @@ app.delete('/api/users/:id', (req, res, next)=> {
   .then( () => res.sendStatus(204))
   .catch(next);
 });
+
+app.use((err, req, res, next)=> {
+  res.status(500).send(err);
+});
 const port = process.env.PORT || 3000;
 
 
@@ -47,14 +53,21 @@ const conn = new Sequelize(process.env.DATABASE_URL || 'postgres://localhost/my_
 
 
 const User = conn.define('user', {
-  name: Sequelize.STRING
+  name: {
+    type: Sequelize.STRING,
+    unique: true
+  },
+  rating: {
+    type: Sequelize.INTEGER,
+    defaultValue: 3
+  }
 });
 
 conn.sync({ force: true })
   .then( ()=> Promise.all([
-    User.create({ name: 'moe' }),
-    User.create({ name: 'larry' }),
-    User.create({ name: 'curly' }),
+    User.create({ name: 'moe', rating: 3 }),
+    User.create({ name: 'larry', rating: 4 }),
+    User.create({ name: 'curly', rating: 5 }),
   ]));
 
 
