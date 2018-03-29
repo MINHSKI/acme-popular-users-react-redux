@@ -41,9 +41,41 @@ app.delete('/api/users/:id', (req, res, next)=> {
   .then( () => res.sendStatus(204))
   .catch(next);
 });
+const jwt = require('jwt-simple');
+
+app.get('/api/sessions/:token', (req, res, next)=> {
+  try{
+    const id = jwt.decode(req.params.token, 'foo').id;
+    User.findById(id)
+      .then( user => {
+        if(user){
+          return res.send(user);
+        }
+        const error = { status: 401 };
+        throw error;
+      })
+  }
+  catch(ex){
+    throw ex;
+  }
+});
+
+app.post('/api/sessions', (req, res, next)=> {
+  User.findOne({ where: req.body })
+    .then( user => {
+      if(user){
+        const token = jwt.encode({ id: user.id }, 'foo');
+        return res.send(token);
+      }
+      const error = {status: 401 };
+      throw error;
+    })
+    .catch(next);
+});
 
 app.use((err, req, res, next)=> {
-  res.status(500).send(err);
+  console.log(err);
+  res.status(err.status || 500).send(err);
 });
 const port = process.env.PORT || 3000;
 
@@ -57,6 +89,9 @@ const User = conn.define('user', {
     type: Sequelize.STRING,
     unique: true
   },
+  password: {
+    type: Sequelize.STRING
+  },
   rating: {
     type: Sequelize.INTEGER,
     defaultValue: 3
@@ -65,9 +100,9 @@ const User = conn.define('user', {
 
 conn.sync({ force: true })
   .then( ()=> Promise.all([
-    User.create({ name: 'moe', rating: 3 }),
-    User.create({ name: 'larry', rating: 4 }),
-    User.create({ name: 'curly', rating: 5 }),
+    User.create({ name: 'moe', rating: 3, password: 'MOE' }),
+    User.create({ name: 'larry', rating: 4, password: 'LARRY' }),
+    User.create({ name: 'curly', rating: 5, password: 'CURLY' }),
   ]));
 
 

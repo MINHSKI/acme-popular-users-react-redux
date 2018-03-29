@@ -1,8 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { logout } from './store';
 
-const Nav = ({ users, mostPopularUser })=> {
+const Nav = ({ users, mostPopularUser, loggedIn, logout })=> {
   return (
     <ul>
       <li>
@@ -29,20 +30,39 @@ const Nav = ({ users, mostPopularUser })=> {
           Create A User
         </Link>
       </li>
+      <li>
+      {
+        loggedIn ? (
+          <a onClick={ logout }>Logout</a>
+        ) : (
+          <Link to='/login'>
+            Login
+          </Link>
+        )
+      }
+      </li>
     </ul>
   );
 };
 
-const mapStateToProps = ({ users })=> {
+const mapStateToProps = ({ users, user })=> {
   const mostPopularUser = users.reduce((memo, user)=> {
     if(typeof memo === 'undefined')
       return user;
     return user.rating > memo.rating ? user : memo;
   }, undefined);
+  const loggedIn = !!user.id;
   return {
     users,
-    mostPopularUser
+    mostPopularUser,
+    loggedIn
   };
 };
 
-export default connect(mapStateToProps)(Nav);
+const mapDispatchToProps = (dispatch)=> {
+  return {
+    logout: ()=> dispatch(logout())
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Nav);

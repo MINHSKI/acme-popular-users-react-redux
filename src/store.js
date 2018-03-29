@@ -5,6 +5,16 @@ const SET_USERS = 'SET_USERS';
 const UPDATE_USER = 'UPDATE_USER';
 const DELETE_USER = 'DELETE_USER';
 const CREATE_USER = 'CREATE_USER';
+const SET_USER = 'SET_USER';
+
+const userReducer = (state = {}, action)=> {
+  switch(action.type){
+    case SET_USER:
+      state = action.user;
+      break;
+  }
+  return state;
+}
 
 const usersReducer = (state = [], action)=> {
   switch(action.type){
@@ -25,7 +35,8 @@ const usersReducer = (state = [], action)=> {
 };
 
 const reducer = combineReducers({
-  users: usersReducer
+  users: usersReducer,
+  user: userReducer
 });
 
 const loadUsers = ()=> {
@@ -52,6 +63,37 @@ const deleteUser = (user, history)=> {
         history.push('/users');
       });
   };
+};
+
+const getUserFromToken = (token)=> {
+  return (dispatch)=> {
+    return axios.get(`/api/sessions/${token}`)
+      .then( result => {
+        dispatch({
+          type: SET_USER,
+          user: result.data
+        });
+      });
+  };
+  
+};
+
+const logout = ()=> {
+  return (dispatch)=> {
+    window.localStorage.removeItem('token');
+    dispatch({
+      type: SET_USER,
+      user: {}
+    });
+  };
+};
+const attemptLogin = (credentials)=> {
+  return (dispatch)=> {
+    return axios.post('/api/sessions', credentials)
+      .then( result => window.localStorage.setItem('token', result.data))
+      .then( ()=> dispatch(getUserFromToken(window.localStorage.getItem('token'))))
+
+  }
 };
 
 const saveUser = (user, history)=> {
@@ -89,4 +131,4 @@ const store = createStore(reducer, applyMiddleware(thunk));
 
 export default store;
 
-export { loadUsers, saveUser, deleteUser };
+export { loadUsers, saveUser, deleteUser, attemptLogin, getUserFromToken, logout };

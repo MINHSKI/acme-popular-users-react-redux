@@ -20,6 +20,7 @@
     "babel-preset-react": "^6.24.1",
     "express": "^4.16.2",
     "faker": "^4.1.0",
+    "jwt-simple": "^0.5.1",
     "pg": "^7.4.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
