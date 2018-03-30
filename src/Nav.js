@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { logout } from './store';
 
-const Nav = ({ users, mostPopularUser, loggedIn, logout })=> {
+const Nav = ({ users, mostPopularUser, loggedIn, logout, user })=> {
   return (
     <ul>
       <li>
@@ -33,7 +33,7 @@ const Nav = ({ users, mostPopularUser, loggedIn, logout })=> {
       <li>
       {
         loggedIn ? (
-          <a onClick={ logout }>Logout</a>
+          <a onClick={ logout }>Logout { user.name }</a>
         ) : (
           <Link to='/login'>
             Login
@@ -53,6 +53,7 @@ const mapStateToProps = ({ users, user })=> {
   }, undefined);
   const loggedIn = !!user.id;
   return {
+    user,
     users,
     mostPopularUser,
     loggedIn
